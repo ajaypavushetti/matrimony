@@ -4,6 +4,7 @@
   "description": "Matrimony Mediator Management Website",
   "scripts": {
     "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "postinstall": "npm run install-all",
     "build": "cd frontend && npm run build",
     "start": "cd backend && node server.js",
     "dev": "cd backend && npm run dev"
