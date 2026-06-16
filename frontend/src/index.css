@@ -315,6 +315,19 @@ small { font-size: 0.85rem; }
   padding-right: 42px;
 }
 
+/* ========== Date Input custom indicator ========== */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(24%) sepia(50%) saturate(2462%) hue-rotate(314deg) brightness(84%) contrast(85%); /* matches --primary color (#8B1A4A) */
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 .form-error {
   font-size: 0.8rem;
   color: var(--danger);
