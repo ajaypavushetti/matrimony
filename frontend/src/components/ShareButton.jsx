@@ -80,21 +80,40 @@ function ShareButton({ profile }) {
       lines.push(`🏠 *Assets:* ${profile.assets}`);
     }
 
-    // Photo URLs (to show previews in WhatsApp)
-    if (profile.photos && profile.photos.length > 0) {
-      lines.push(`━━━━━━━━━━━━━━━━━━`);
-      lines.push(`📷 *Photos:*`);
-      profile.photos.forEach((photo, idx) => {
-        lines.push(`🔗 Photo ${idx + 1}: ${photo.url}`);
-      });
-    }
-
     lines.push(`━━━━━━━━━━━━━━━━━━`);
     return lines.join('\n');
   };
 
-  const handleWhatsAppShare = () => {
+  const handleWhatsAppShare = async () => {
     const text = generateText();
+
+    // Check if browser supports sharing files (primarily mobile)
+    if (navigator.share && navigator.canShare && profile.photos && profile.photos.length > 0) {
+      try {
+        const filePromises = profile.photos.slice(0, 4).map(async (photo, idx) => {
+          // Cache-busting query to avoid CORS issues
+          const response = await fetch(`${photo.url}?t=${Date.now()}`);
+          const blob = await response.blob();
+          const extension = blob.type.split('/')[1] || 'jpg';
+          return new File([blob], `photo_${idx + 1}.${extension}`, { type: blob.type });
+        });
+
+        const files = await Promise.all(filePromises);
+
+        if (navigator.canShare({ files })) {
+          await navigator.share({
+            files: files,
+            title: `Matrimonial Profile - ${profile.name}`,
+            text: text
+          });
+          return; // Shared successfully with files!
+        }
+      } catch (err) {
+        console.error('File sharing failed, falling back to text-only share:', err);
+      }
+    }
+
+    // Fallback: Share as text on WhatsApp (without photo links)
     const encoded = encodeURIComponent(text);
     window.open(`https://wa.me/?text=${encoded}`, '_blank');
   };
